@@ -23,6 +23,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('./uploads'));
 
+swaggerDocs.servers.shift({
+	url: process.env.SERVER_URL,
+	description: 'API',
+});
 // swagger ui
 app.use('/apis', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 // song api

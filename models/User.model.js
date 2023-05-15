@@ -19,7 +19,6 @@ const userSchema = new Schema(
 		playlist: {
 			type: Schema.Types.ObjectId,
 			ref: 'Album',
-			default: [],
 		},
 		avatar: {
 			type: Schema.Types.ObjectId,

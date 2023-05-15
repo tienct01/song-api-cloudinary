@@ -1,0 +1,370 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Song Dir API",
+    "version": "1.0.0",
+    "contact": {
+      "email": "doanvanduytien@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Development Server"
+    },
+    {
+      "url": "process.env.PRODUCTION_URL",
+      "description": "Deploy"
+    }
+  ],
+  "tags": [
+    {
+      "name": "songs",
+      "description": "bài hát"
+    },
+    {
+      "name": "albums",
+      "description": "collection"
+    },
+    {
+      "name": "users",
+      "description": "Api về người dùng"
+    }
+  ],
+  "paths": {
+    "/songs": {
+      "get": {
+        "summary": "Lấy tất cả bài hát",
+        "tags": [
+          "songs"
+        ],
+        "description": "Lấy tất cả bài hát, có tìm kiếm theo tên và album",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Từ khóa tìm kiếm theo tên và album",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "summary": "Tạo bài hát mới",
+        "description": "Tự upload bài hát và điền các field, k điền tên thì tên lấy theo file của bài hát",
+        "tags": [
+          "songs"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Song"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          }
+        }
+      }
+    },
+    "/songs/{id}": {
+      "delete": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "Xóa bài hát",
+        "description": "Xóa bài hát theo id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/albums": {
+      "get": {
+        "summary": "Lấy tất cả album",
+        "tags": [
+          "albums"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "summary": "Tạo album",
+        "tags": [
+          "albums"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Album"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          }
+        }
+      }
+    },
+    "/albums/{collectionName}": {
+      "patch": {
+        "summary": "Thêm bài hát vào albumss",
+        "tags": [
+          "albums"
+        ],
+        "description": "Sửa albums ( thêm bài hát vào albums bằng api này )",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "collectionName",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "audio": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "albumName": "",
+                "audio": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "albums"
+        ],
+        "summary": "Lấy albums",
+        "description": "Lấy albums theo tên của albums",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "collectionName",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "albums"
+        ],
+        "summary": "Xóa albums theo tên",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "collectionName",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Đăng ký",
+        "tags": [
+          "users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Fail"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Đăng nhập",
+        "tags": [
+          "users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Mật khẩu"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Fail"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Song": {
+        "type": "object",
+        "required": [
+          "artist",
+          "audio",
+          "thumbnail"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tên bài hát"
+          },
+          "artist": {
+            "type": "string",
+            "description": "Tên của tác giả"
+          },
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "description": "Bài hát"
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "binary",
+            "description": "Thumbnail của bài hát"
+          }
+        }
+      },
+      "Album": {
+        "type": "object",
+        "required": [
+          "collectionName"
+        ],
+        "properties": {
+          "collectionName": {
+            "type": "string",
+            "description": "Tên của album"
+          },
+          "collectionImage": {
+            "type": "string",
+            "format": "binary",
+            "description": "Ảnh của album"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tên người dùng"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mật khẩu"
+          }
+        }
+      }
+    }
+  }
+}

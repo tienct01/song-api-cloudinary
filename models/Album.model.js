@@ -1,5 +1,5 @@
-const { Schema } = require("mongoose");
-const mongoose = require("../services/mongodb.js");
+const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const albumSchema = new mongoose.Schema(
 	{
@@ -10,12 +10,12 @@ const albumSchema = new mongoose.Schema(
 		},
 		collectionImage: {
 			type: Schema.Types.ObjectId,
-			ref: "Asset",
+			ref: 'Asset',
 		},
 		audioList: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: "Song",
+				ref: 'Song',
 			},
 		],
 	},
@@ -24,5 +24,5 @@ const albumSchema = new mongoose.Schema(
 	}
 );
 
-const Album = mongoose.model("Album", albumSchema);
+const Album = mongoose.model('Album', albumSchema);
 module.exports = Album;

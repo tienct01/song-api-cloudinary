@@ -1,4 +1,4 @@
-const mongoose = require("../services/mongodb.js");
+const mongoose = require('mongoose');
 
 const assetSchema = new mongoose.Schema(
 	{
@@ -8,7 +8,7 @@ const assetSchema = new mongoose.Schema(
 		},
 		resource_type: {
 			type: String,
-			enum: ["image", "video", "raw"],
+			enum: ['image', 'video', 'raw'],
 			required: true,
 		},
 		url: {
@@ -21,6 +21,6 @@ const assetSchema = new mongoose.Schema(
 	}
 );
 
-const Asset = mongoose.model("Asset", assetSchema);
+const Asset = mongoose.model('Asset', assetSchema);
 
 module.exports = Asset;

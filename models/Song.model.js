@@ -1,5 +1,5 @@
-const { Schema } = require("mongoose");
-const mongoose = require("../services/mongodb.js");
+const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const songSchema = new mongoose.Schema(
 	{
@@ -15,7 +15,7 @@ const songSchema = new mongoose.Schema(
 		},
 		audio: {
 			type: Schema.Types.ObjectId,
-			ref: "Asset",
+			ref: 'Asset',
 			required: true,
 		},
 		downloadUrl: {
@@ -25,12 +25,12 @@ const songSchema = new mongoose.Schema(
 		album: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: "Album",
+				ref: 'Album',
 			},
 		],
 		thumbnail: {
 			type: Schema.Types.ObjectId,
-			ref: "Asset",
+			ref: 'Asset',
 			required: true,
 		},
 	},
@@ -38,5 +38,5 @@ const songSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
-
-module.exports = mongoose.model("Song", songSchema);
+const Song = mongoose.model('Song', songSchema);
+module.exports = Song;

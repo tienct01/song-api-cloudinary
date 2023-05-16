@@ -10,6 +10,10 @@
   "servers": [],
   "tags": [
     {
+      "name": "users",
+      "description": "Người dùng"
+    },
+    {
       "name": "songs",
       "description": "bài hát"
     },
@@ -18,8 +22,8 @@
       "description": "collection"
     },
     {
-      "name": "users",
-      "description": "Api về người dùng"
+      "name": "comments",
+      "description": "Comment"
     }
   ],
   "paths": {
@@ -85,7 +89,8 @@
             "name": "id",
             "schema": {
               "type": "string"
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -146,7 +151,10 @@
           {
             "in": "path",
             "name": "collectionName",
-            "required": true
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -190,7 +198,10 @@
           {
             "in": "path",
             "name": "collectionName",
-            "required": true
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -208,7 +219,10 @@
           {
             "in": "path",
             "name": "collectionName",
-            "required": true
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -285,6 +299,142 @@
           }
         }
       }
+    },
+    "/comments/{songId}": {
+      "get": {
+        "summary": "Lấy comment của 1 song",
+        "tags": [
+          "comments"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "Id của bài hát",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Song not found"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "post": {
+        "summary": "Tạo comment",
+        "tags": [
+          "comments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text",
+                  "userId",
+                  "songId"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "example": "Nội dung tin nhắn"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": "Id của người dùng"
+                  },
+                  "songId": {
+                    "type": "string",
+                    "example": "Id của bài hát được bình luận"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Error"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}": {
+      "parameters": [
+        {
+          "name": "commentId",
+          "in": "path",
+          "description": "Id của comment",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "Sửa nội dung tin nhắn",
+        "tags": [
+          "comments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "example": "Nội dung muốn sửa"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Xóa comment",
+        "tags": [
+          "comments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorize"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -353,6 +503,23 @@
           "password": {
             "type": "string",
             "description": "Mật khẩu"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "required": [
+          "text",
+          "user"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Nội dung tin nhắn"
+          },
+          "user": {
+            "type": "string",
+            "description": "Id của người dùng"
           }
         }
       }

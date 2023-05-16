@@ -16,13 +16,19 @@ const userSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		playlist: {
-			type: Schema.Types.ObjectId,
-			ref: 'Album',
-		},
+		playlist: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Album',
+			},
+		],
 		avatar: {
 			type: Schema.Types.ObjectId,
 			ref: 'Asset',
+		},
+		verified: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{

@@ -13,6 +13,7 @@ const commentSchema = new Schema(
 	},
 	{
 		timestamps: true,
+		collection: 'comments',
 	}
 );
 

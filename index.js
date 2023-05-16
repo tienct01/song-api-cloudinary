@@ -9,6 +9,7 @@ const errorHanlder = require('./middlewares/errorHandler.js');
 const songRouter = require('./routes/song.route.js');
 const albumRouter = require('./routes/album.route.js');
 const authRouter = require('./routes/auth.route.js');
+const commentRouter = require('./routes/comment.route.js');
 
 // Config database
 require('./configs/mongodb.js');
@@ -35,6 +36,8 @@ app.use('/songs', songRouter);
 app.use('/albums', albumRouter);
 // auth api
 app.use('/', authRouter);
+// comment api
+app.use('/comments', commentRouter);
 
 app.use(errorHanlder);
 

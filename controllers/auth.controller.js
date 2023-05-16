@@ -5,6 +5,16 @@ const jwt = require('jsonwebtoken');
 async function signUp(req, res, next) {
 	try {
 		const { name, email, password } = req.body;
+
+		const user = await User.findOne({
+			email: email,
+		});
+		if (!user) {
+			return res.status(400).json({
+				err: true,
+				message: 'Email existed',
+			});
+		}
 		const newUser = new User({
 			name: name,
 			email: email,
@@ -28,9 +38,12 @@ async function signIn(req, res, next) {
 				message: 'Field Required',
 			});
 		}
-		const user = await User.findOne({
-			email: email,
-		});
+		const user = await User.findOne(
+			{
+				email: email,
+			},
+			'-playlist -__v'
+		);
 
 		if (!user) {
 			return res.status(404).json({
@@ -47,7 +60,7 @@ async function signIn(req, res, next) {
 			});
 		}
 
-		delete user.password;
+		user.password = undefined;
 		const accessToken = jwt.sign({ user: user }, process.env.SECRET, {
 			expiresIn: '10d',
 		});
@@ -80,8 +93,16 @@ async function isEmailExisted(req, res, next) {
 	}
 }
 
+async function sendVerifyCode(req, res, next) {
+	try {
+		const {} = req.body;
+	} catch (error) {
+		next(error);
+	}
+}
 module.exports = {
 	signUp,
 	isEmailExisted,
 	signIn,
+	sendVerifyCode,
 };

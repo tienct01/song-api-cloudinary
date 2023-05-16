@@ -33,6 +33,12 @@ const songSchema = new mongoose.Schema(
 			ref: 'Asset',
 			required: true,
 		},
+		comment: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Comment',
+			},
+		],
 	},
 	{
 		timestamps: true,

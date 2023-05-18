@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 const path = require('path');
-const { generateVerifyCode } = require('../utils/helpers.js');
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -11,12 +10,12 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-async function sendVerifyCode(email) {
+async function sendVerifyCode(email, verifyCode) {
 	try {
-		const html = await ejs.renderFile(path.resolve(process.cwd(), '/assets/verifyCode.ejs'), {
-			verifyCode: generateVerifyCode(),
+		const html = await ejs.renderFile(path.resolve(process.cwd(), 'assets/verifyCode.ejs'), {
+			verifyCode: verifyCode,
 		});
-		transporter.sendMail({
+		return transporter.sendMail({
 			from: process.env.GOOGLE_USER,
 			to: email,
 			html: html,
@@ -29,10 +28,10 @@ async function sendVerifyCode(email) {
 
 async function sendResetPassword(email, newPassword) {
 	try {
-		const html = await ejs.renderFile(path.resolve(process.cwd(), '/assets/resetPass.ejs'), {
+		const html = await ejs.renderFile(path.resolve(process.cwd(), 'assets/resetPass.ejs'), {
 			resetPassword: newPassword,
 		});
-		transporter.sendMail({
+		return transporter.sendMail({
 			from: process.env.GOOGLE_USER,
 			to: email,
 			html: html,

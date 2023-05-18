@@ -81,6 +81,11 @@
         "tags": [
           "songs"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Xóa bài hát",
         "description": "Xóa bài hát theo id",
         "parameters": [
@@ -265,37 +270,167 @@
       }
     },
     "/login": {
-      "post": {
+      "get": {
         "summary": "Đăng nhập",
         "tags": [
           "users"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "description": "Email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "Mật khẩu"
-                  }
-                }
-              }
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "doanvanduytien@gmail.com"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "sdfsdfsdfsdf"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Success"
           },
           "400": {
             "description": "Fail"
+          }
+        }
+      }
+    },
+    "/send_verify_code": {
+      "post": {
+        "summary": "Gửi verify code về email",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "default": {
+            "description": "Chill"
+          }
+        }
+      }
+    },
+    "/verify_account": {
+      "post": {
+        "summary": "Xác nhận email của account",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "doanvanduytien@gmail.com"
+            }
+          },
+          {
+            "name": "verifyCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "666666"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Verify code wrong"
+          }
+        }
+      }
+    },
+    "/reset_password": {
+      "post": {
+        "summary": "Gửi mật khẩu đã reset về email",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/my_profile": {
+      "get": {
+        "summary": "Lấy profile",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Id cua user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/change_password": {
+      "patch": {
+        "summary": "Đổi mật khẩu",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "id cua user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "User not found"
           }
         }
       }
@@ -438,6 +573,18 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "UnauthorizeError": {
+        "description": "Unauthorize"
+      }
+    },
     "schemas": {
       "Song": {
         "type": "object",

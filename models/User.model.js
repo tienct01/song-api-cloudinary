@@ -30,6 +30,11 @@ const userSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		// 2 - user, 1 - admin
+		role: {
+			type: Number,
+			default: 2,
+		},
 	},
 	{
 		timestamps: true,

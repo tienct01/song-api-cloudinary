@@ -17,6 +17,8 @@ require('./configs/mongodb.js');
 require('./configs/cloudinaryServices.js');
 // Config passport
 require('./configs/passport.js');
+// Nodemailer
+require('./configs/nodemailer.js');
 
 app.use(cors());
 app.use(morgan('dev'));

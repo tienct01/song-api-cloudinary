@@ -47,7 +47,6 @@ async function createComment(req, res, next) {
 			});
 		}
 		const song = await Song.findById(songId);
-		console.log('song', songId);
 		if (!song) {
 			return res.status(404).json({
 				err: true,

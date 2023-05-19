@@ -194,7 +194,7 @@ async function resetPassword(req, res, next) {
 async function myProfile(req, res, next) {
 	try {
 		const { id } = req.query;
-		const myProfile = await User.findById(myId, '-password').populate({
+		const myProfile = await User.findById(id, '-password').populate({
 			path: 'playlist',
 		});
 		if (!myProfile) {
@@ -214,11 +214,10 @@ async function myProfile(req, res, next) {
 
 async function changePassword(req, res, next) {
 	try {
-		const { id } = req.params;
-		const { newPassword } = req.body;
+		const { id } = req.query;
+		const { oldPassword, newPassword } = req.body;
 
-		const user = await User.findByIdAndUpdate(id, { password: newPassword });
-
+		const user = await User.findById(id);
 		if (!user) {
 			return res.status(404).json({
 				err: true,
@@ -226,8 +225,19 @@ async function changePassword(req, res, next) {
 			});
 		}
 
+		const isMatch = await bcrypt.compare(oldPassword, user.password);
+		if (!isMatch) {
+			return res.status(400).json({
+				err: true,
+				message: 'Old password is wrong',
+			});
+		}
+
+		user.password = newPassword;
+		await user.save();
+
 		return res.status(200).json({
-			message: 'success',
+			message: 'Success',
 		});
 	} catch (error) {
 		next(error);

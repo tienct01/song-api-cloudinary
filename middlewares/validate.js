@@ -14,6 +14,17 @@ const schemas = {
 	verifyBody: joi.object({
 		email: joi.string().email(),
 	}),
+	changePasswordBody: joi.object({
+		oldPassword: joi.string(),
+		newPassword: joi.string().min(6).max(30),
+	}),
+	pathId: joi.object({
+		id: joi.string().custom((value, helpers) => {
+			if (!isValidObjectId(value)) {
+				return helpers.message('Invalid id');
+			} else return true;
+		}),
+	}),
 	queryId: joi.object({
 		id: joi.string().custom((value, helpers) => {
 			if (!isValidObjectId(value)) {
@@ -60,4 +71,23 @@ function validateQueryParams(schema) {
 	};
 }
 
-module.exports = { schemas, validateBody, validateQueryParams };
+function validateParams(schema, fieldName) {
+	return (req, res, next) => {
+		try {
+			const { error, value } = schema.validate({
+				id: req.params[fieldName],
+			});
+			if (error) {
+				return res.status(400).json({
+					err: true,
+					message: error,
+				});
+			}
+			next();
+		} catch (error) {
+			next(error);
+		}
+	};
+}
+
+module.exports = { schemas, validateBody, validateQueryParams, validateParams };

@@ -5,21 +5,41 @@ const Asset = require('../models/Asset.model.js');
 
 async function getAllSongs(req, res, next) {
 	try {
-		const { q = '' } = req.query;
-		const songs = await Song.find({})
+		const { q = '', page = 1, limit = 5 } = req.query;
+		const songs = await Song.find({
+			$or: [
+				{
+					name: { $regex: q, $options: 'i' },
+				},
+				{
+					artist: { $regex: q, $options: 'i' },
+				},
+			],
+		})
 			.sort({
 				updatedAt: 'desc',
 			})
-			.populate(['audio', 'thumbnail'])
-			.or([
-				{
-					name: { $regex: `${q}`, $options: 'i' },
-				},
-				{
-					artist: { $regex: `${q}`, $options: 'i' },
-				},
-			]);
+			.skip((page - 1) * limit)
+			.limit(limit)
+			.populate({
+				path: 'audio',
+				select: 'url createdAt',
+			})
+			.populate({
+				path: 'thumbnail',
+				select: 'url',
+			});
+
+		const songCount = await Song.count().exec();
+		let totalPage;
+		if (songCount % limit !== 0) {
+			totalPage = Math.floor(songCount / limit) + 1;
+		} else {
+			totalPage = Math.floor(songCount / limit);
+		}
+
 		return res.json({
+			totalPage: totalPage,
 			data: songs,
 		});
 	} catch (error) {
@@ -90,6 +110,10 @@ async function deleteSong(req, res, next) {
 		}
 		destroyAsset(deletedSong.audio.public_id, 'video');
 		destroyAsset(deletedSong.thumbnail.public_id, 'image');
+
+		Asset.findByIdAndDelete(deletedSong.audio._id);
+		Asset.findByIdAndDelete(deletedSong.thumbnail._id);
+
 		return res.status(200).json({
 			data: deletedSong,
 		});

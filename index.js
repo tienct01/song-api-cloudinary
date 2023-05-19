@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('./uploads'));
 
-swaggerDocs.servers.shift({
+swaggerDocs.servers.push({
 	url: process.env.SERVER_URL,
 	description: 'API',
 });

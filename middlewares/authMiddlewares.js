@@ -1,12 +1,5 @@
 async function isAdmin(req, res, next) {
 	try {
-		if (!req.user) {
-			return res.status(401).json({
-				err: true,
-				message: 'Unauthorize',
-			});
-		}
-
 		if (req.user.role !== 1) {
 			return res.status(401).json({
 				err: true,
@@ -22,10 +15,10 @@ async function isAdmin(req, res, next) {
 
 async function isUser(req, res, next) {
 	try {
-		if (!req.user) {
+		if (!req.user.verified) {
 			return res.status(401).json({
 				err: true,
-				message: 'Unauthorize',
+				message: 'Email not confirmed yet',
 			});
 		}
 		next();
@@ -35,15 +28,9 @@ async function isUser(req, res, next) {
 }
 async function isOwner(req, res, next) {
 	try {
-		const { id } = req.query;
-		if (!req.user) {
-			return res.status(401).json({
-				err: true,
-				message: 'Unauthorize',
-			});
-		}
-
-		if (req.user._id !== id) {
+		const { id } = req.query || req.params;
+		// User is admin or owner
+		if (req.user._id !== id && req.user.role !== 1) {
 			return res.status(401).json({
 				err: true,
 				message: 'You are not the owner',

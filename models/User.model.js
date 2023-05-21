@@ -16,10 +16,10 @@ const userSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		playlist: [
+		tracks: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: 'Album',
+				ref: 'Song',
 			},
 		],
 		avatar: {

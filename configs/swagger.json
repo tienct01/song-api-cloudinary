@@ -72,6 +72,11 @@
         "tags": [
           "songs"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -185,7 +190,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "audio": {
+                  "songs": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -195,7 +200,7 @@
               },
               "example": {
                 "albumName": "",
-                "audio": []
+                "songs": []
               }
             }
           }
@@ -512,6 +517,11 @@
         "tags": [
           "comments"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -526,10 +536,6 @@
                   "text": {
                     "type": "string",
                     "example": "Nội dung tin nhắn"
-                  },
-                  "userId": {
-                    "type": "string",
-                    "example": "Id của người dùng"
                   },
                   "songId": {
                     "type": "string",
@@ -567,6 +573,11 @@
         "tags": [
           "comments"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -602,6 +613,11 @@
         "tags": [
           "comments"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -633,7 +649,6 @@
       "Song": {
         "type": "object",
         "required": [
-          "artist",
           "audio",
           "thumbnail"
         ],
@@ -641,10 +656,6 @@
           "name": {
             "type": "string",
             "description": "Tên bài hát"
-          },
-          "artist": {
-            "type": "string",
-            "description": "Tên của tác giả"
           },
           "audio": {
             "type": "string",
@@ -667,6 +678,10 @@
           "collectionName": {
             "type": "string",
             "description": "Tên của album"
+          },
+          "user": {
+            "type": "string",
+            "description": "Id nguời dùng"
           },
           "collectionImage": {
             "type": "string",

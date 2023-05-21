@@ -6,7 +6,7 @@ const { isValidObjectId } = require('mongoose');
 
 async function getAllAlbums(req, res, next) {
 	try {
-		const albums = await Album.find().populate(['collectionImage', 'audioList']);
+		const albums = await Album.find().populate(['collectionImage', 'songs']);
 		return res.status(200).json({
 			data: albums,
 		});
@@ -19,7 +19,7 @@ async function getAlbum(req, res, next) {
 		const { collectionName } = req.params;
 		const album = await Album.findOne({
 			collectionName: collectionName,
-		}).populate('audioList');
+		}).populate('songs');
 
 		if (!album) {
 			return res.status(404).json({
@@ -69,13 +69,13 @@ async function createAlbum(req, res, next) {
 async function addAudio(req, res, next) {
 	try {
 		const { collectionName } = req.params;
-		const { audio = [], albumName } = req.body;
+		const { songs = [], albumName } = req.body;
 		if (!collectionName) {
 			return res.status(400).json({
 				err: 'Field Required',
 			});
 		}
-		for (let id of audio) {
+		for (let id of songs) {
 			if (!isValidObjectId(id)) {
 				return res.status(400).json({
 					err: 'Invalid audio id',
@@ -87,7 +87,7 @@ async function addAudio(req, res, next) {
 				collectionName: collectionName,
 			},
 			{
-				audioList: audio,
+				songs: songs,
 				collectionName: albumName,
 			}
 		);
@@ -113,6 +113,7 @@ async function deleteAlbum(req, res, next) {
 
 		if (deleteAlbum.collectionImage) {
 			destroyAsset(deletedAlbum.collectionImage.public_id, 'image');
+			Asset.findByIdAndDelete(deletedAlbum.collectionImage._id);
 		}
 		return res.staus(200).json({
 			data: deletedAlbum,

@@ -12,6 +12,7 @@ const songSchema = new mongoose.Schema(
 		},
 		artist: {
 			type: Schema.Types.ObjectId,
+			ref: 'User',
 		},
 		audio: {
 			type: Schema.Types.ObjectId,
@@ -22,12 +23,6 @@ const songSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		album: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Album',
-			},
-		],
 		thumbnail: {
 			type: Schema.Types.ObjectId,
 			ref: 'Asset',

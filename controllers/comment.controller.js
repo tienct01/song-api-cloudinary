@@ -38,9 +38,10 @@ async function getComments(req, res, next) {
 
 async function createComment(req, res, next) {
 	try {
-		const { text, userId, songId } = req.body;
+		const { text, songId } = req.body;
+		const userId = req.user._id;
 
-		if (text === '' || songId === '' || userId === '') {
+		if (text === '' || songId === '') {
 			return res.status(400).json({
 				err: true,
 				message: 'Field required',

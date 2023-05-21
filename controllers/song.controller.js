@@ -48,12 +48,8 @@ async function getAllSongs(req, res, next) {
 }
 async function createSong(req, res, next) {
 	try {
-		const { name, artist, album = [] } = req.body;
-		if (!artist) {
-			return res.status(400).json({
-				err: 'Field required',
-			});
-		}
+		const { name } = req.body;
+		const artist = req.user._id;
 		if (!req.files['thumbnail']) {
 			return res.status(400).json({
 				err: 'Thumbnail required',
@@ -85,7 +81,6 @@ async function createSong(req, res, next) {
 			name: name || req.files['audio'][0].originalname,
 			artist: artist || 'Unknown',
 			duration: audioRes.duration,
-			album: album,
 			audio: audioAsset._id,
 			thumbnail: thumbnailAsset._id,
 			downloadUrl: await getAssetAttachment(audioRes.public_id, name || req.files['audio'][0].originalname),

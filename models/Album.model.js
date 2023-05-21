@@ -12,7 +12,7 @@ const albumSchema = new mongoose.Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'Asset',
 		},
-		audioList: [
+		songs: [
 			{
 				type: Schema.Types.ObjectId,
 				ref: 'Song',

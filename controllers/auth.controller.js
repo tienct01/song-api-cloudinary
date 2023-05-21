@@ -5,6 +5,7 @@ const { sendVerifyCode, sendResetPassword } = require('../configs/nodemailer.js'
 const { generateVerifyCode, generateNewPassword } = require('../utils/helpers.js');
 const VerifyCode = require('../models/VerifyCode.model.js');
 
+//! [POST] /register
 async function signUp(req, res, next) {
 	try {
 		const { name, email, password } = req.body;
@@ -33,6 +34,7 @@ async function signUp(req, res, next) {
 	}
 }
 
+//! [GET] /login
 async function signIn(req, res, next) {
 	try {
 		const { email, password } = req.query;
@@ -46,7 +48,7 @@ async function signIn(req, res, next) {
 			{
 				email: email,
 			},
-			'-playlist -__v'
+			'-tracks -__v -name -email -verified -role'
 		);
 
 		if (!user) {
@@ -65,8 +67,9 @@ async function signIn(req, res, next) {
 		}
 
 		user.password = undefined;
-		const accessToken = jwt.sign({ user: user }, process.env.SECRET, {
+		const accessToken = jwt.sign({ _id: user._id, iat: Date.now() }, process.env.SECRET, {
 			expiresIn: '10d',
+			issuer: 'music-app',
 		});
 
 		return res.status(200).json({
@@ -77,6 +80,7 @@ async function signIn(req, res, next) {
 		next(error);
 	}
 }
+//!
 async function isEmailExisted(req, res, next) {
 	try {
 		const { email } = req.body;
@@ -96,7 +100,7 @@ async function isEmailExisted(req, res, next) {
 		next(error);
 	}
 }
-
+//! [POST] /send_verify_code
 async function sendVerify(req, res, next) {
 	try {
 		const { email } = req.query;
@@ -128,6 +132,7 @@ async function sendVerify(req, res, next) {
 		next(error);
 	}
 }
+//! [POST] /verify_account
 async function verifyAccount(req, res, next) {
 	try {
 		const { email, verifyCode } = req.query;
@@ -164,6 +169,7 @@ async function verifyAccount(req, res, next) {
 	}
 }
 
+//! [POST] /reset_password
 async function resetPassword(req, res, next) {
 	try {
 		const { email } = req.query;
@@ -190,12 +196,12 @@ async function resetPassword(req, res, next) {
 		next(error);
 	}
 }
-
+//! [GET] /my_profile
 async function myProfile(req, res, next) {
 	try {
 		const { id } = req.query;
 		const myProfile = await User.findById(id, '-password').populate({
-			path: 'playlist',
+			path: 'tracks',
 		});
 		if (!myProfile) {
 			return res.status(404).json({
@@ -211,7 +217,7 @@ async function myProfile(req, res, next) {
 		next(error);
 	}
 }
-
+//! [PATCH] /change_password
 async function changePassword(req, res, next) {
 	try {
 		const { id } = req.query;

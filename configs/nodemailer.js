@@ -3,7 +3,7 @@ const ejs = require('ejs');
 const path = require('path');
 
 const transporter = nodemailer.createTransport({
-	service: 'gmail',
+	host: 'smtp.gmail.com',
 	auth: {
 		user: process.env.GOOGLE_USER,
 		pass: process.env.GOOGLE_APP_PASSWORD,

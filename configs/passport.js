@@ -10,11 +10,11 @@ passport.use(
 			jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 		},
 		async function (payload, done) {
-			const user = await User.findById(payload.user._id);
+			const user = await User.findById(payload._id);
 			if (!user) {
 				done('User does not exist', false);
 			} else {
-				done(null, payload.user);
+				done(null, user);
 			}
 		}
 	)

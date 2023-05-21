@@ -54,7 +54,7 @@ async function signIn(req, res, next) {
 		if (!user) {
 			return res.status(404).json({
 				err: true,
-				message: 'User not found',
+				message: "Accout doesn't exist",
 			});
 		}
 		const match = await bcrypt.compare(password, user.password);

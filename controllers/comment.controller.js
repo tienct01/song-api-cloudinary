@@ -8,7 +8,6 @@ async function getComments(req, res, next) {
 		const { songId } = req.params;
 		if (!isValidObjectId(songId)) {
 			return res.status(400).json({
-				err: true,
 				message: 'Invalid id',
 			});
 		}
@@ -24,7 +23,6 @@ async function getComments(req, res, next) {
 
 		if (!song) {
 			return res.status(404).json({
-				err: true,
 				message: 'Not found',
 			});
 		}
@@ -43,21 +41,18 @@ async function createComment(req, res, next) {
 
 		if (text === '' || songId === '') {
 			return res.status(400).json({
-				err: true,
 				message: 'Field required',
 			});
 		}
 		const song = await Song.findById(songId);
 		if (!song) {
 			return res.status(404).json({
-				err: true,
 				message: 'Song not found',
 			});
 		}
 		const user = await User.findById(userId);
 		if (!user) {
 			return res.status(404).json({
-				err: true,
 				message: 'User not found',
 			});
 		}
@@ -90,7 +85,6 @@ async function editComment(req, res, next) {
 
 		if (!comment) {
 			return res.status(404).json({
-				err: true,
 				message: 'Comment not found',
 			});
 		}
@@ -111,7 +105,6 @@ async function deleteComment(req, res, next) {
 
 		if (!deletedComment) {
 			return res.status(404).json({
-				err: true,
 				message: 'Not found',
 			});
 		}

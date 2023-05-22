@@ -32,6 +32,9 @@ const schemas = {
 			} else return true;
 		}),
 	}),
+	createGenre: joi.object({
+		genreName: joi.string(),
+	}),
 };
 
 function validateBody(schema) {
@@ -41,7 +44,6 @@ function validateBody(schema) {
 
 			if (error) {
 				return res.status(400).json({
-					err: true,
 					message: error,
 				});
 			}
@@ -60,7 +62,6 @@ function validateQueryParams(schema) {
 			});
 			if (error) {
 				return res.status(400).json({
-					err: true,
 					message: error,
 				});
 			}
@@ -79,7 +80,6 @@ function validateParams(schema, fieldName) {
 			});
 			if (error) {
 				return res.status(400).json({
-					err: true,
 					message: error,
 				});
 			}

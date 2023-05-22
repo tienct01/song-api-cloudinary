@@ -15,7 +15,6 @@ async function signUp(req, res, next) {
 		});
 		if (user) {
 			return res.status(400).json({
-				err: true,
 				message: 'Email existed',
 			});
 		}
@@ -40,7 +39,6 @@ async function signIn(req, res, next) {
 		const { email, password } = req.query;
 		if (email === '' || password === '') {
 			return res.status(400).json({
-				err: true,
 				message: 'Field Required',
 			});
 		}
@@ -53,7 +51,6 @@ async function signIn(req, res, next) {
 
 		if (!user) {
 			return res.status(404).json({
-				err: true,
 				message: "Accout doesn't exist",
 			});
 		}
@@ -61,7 +58,6 @@ async function signIn(req, res, next) {
 
 		if (!match) {
 			return res.status(400).json({
-				err: true,
 				message: 'Password wrong',
 			});
 		}
@@ -89,7 +85,6 @@ async function isEmailExisted(req, res, next) {
 		});
 		if (!user) {
 			return res.status(404).json({
-				err: true,
 				message: 'Not Found',
 			});
 		}
@@ -140,14 +135,12 @@ async function verifyAccount(req, res, next) {
 
 		if (!code) {
 			return res.status(400).json({
-				err: true,
 				message: 'Verify code wrong',
 			});
 		}
 		// If verify code expires
 		if (Date.now() - verifyCode.updatedAt > 5 * 60 * 60 * 1000) {
 			return res.status(400).json({
-				err: true,
 				message: 'Verify code wrong',
 			});
 		}
@@ -180,7 +173,6 @@ async function resetPassword(req, res, next) {
 
 		if (!user) {
 			return res.status(404).json({
-				err: true,
 				message: 'User not found',
 			});
 		}
@@ -205,7 +197,6 @@ async function myProfile(req, res, next) {
 		});
 		if (!myProfile) {
 			return res.status(404).json({
-				err: true,
 				message: 'User not found',
 			});
 		}
@@ -226,7 +217,6 @@ async function changePassword(req, res, next) {
 		const user = await User.findById(id);
 		if (!user) {
 			return res.status(404).json({
-				err: true,
 				message: 'User not found',
 			});
 		}
@@ -234,7 +224,6 @@ async function changePassword(req, res, next) {
 		const isMatch = await bcrypt.compare(oldPassword, user.password);
 		if (!isMatch) {
 			return res.status(400).json({
-				err: true,
 				message: 'Old password is wrong',
 			});
 		}

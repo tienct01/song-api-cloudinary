@@ -18,6 +18,10 @@ const albumSchema = new mongoose.Schema(
 				ref: 'Song',
 			},
 		],
+		limit: {
+			type: Number,
+			default: 10,
+		},
 	},
 	{
 		timestamps: true,

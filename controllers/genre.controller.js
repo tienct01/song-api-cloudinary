@@ -31,30 +31,4 @@ async function createGenre(req, res, next) {
 	}
 }
 
-//! [PATCH] /genres
-async function addSongsToGenre(req, res, next) {
-	try {
-		const { genreId } = req.params;
-		const { songIds = [] } = req.body;
-
-		for (let i = 0; i < songIds.length; i++) {
-			if (isValidObjectId(songIds[i])) {
-				return res.status(400).json({
-					message: 'Invalid Id',
-				});
-			}
-		}
-		const updateGenre = await Genre.findByIdAndUpdate(genreId, {
-			songs: songIds,
-		});
-
-		return res.status(200).json({
-			data: updateGenre,
-		});
-	} catch (error) {
-		console.log('Genre error', error);
-		next(error);
-	}
-}
-
-module.exports = { getAllGenres, createGenre, addSongsToGenre };
+module.exports = { getAllGenres, createGenre };

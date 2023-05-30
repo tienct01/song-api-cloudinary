@@ -79,15 +79,23 @@ async function editComment(req, res, next) {
 		const { commentId } = req.params;
 		const { text } = req.body;
 
-		const comment = await Comment.findByIdAndUpdate(commentId, {
-			text: text,
-		});
+		const comment = await Comment.findById(commentId);
 
 		if (!comment) {
 			return res.status(404).json({
 				message: 'Comment not found',
 			});
 		}
+
+		// Check is author or not
+		if (req.user._id !== comment.user && req.user.role !== 1) {
+			return res.status(403).json({
+				message: 'Forbidden',
+			});
+		}
+
+		comment.text = text;
+		await comment.save();
 
 		return res.status(200).json({
 			data: comment,
@@ -101,15 +109,24 @@ async function deleteComment(req, res, next) {
 	try {
 		const { commentId } = req.params;
 
-		const deletedComment = await Comment.findByIdAndDelete(commentId);
+		const comment = await Comment.findById(commentId);
 
-		if (!deletedComment) {
+		if (!comment) {
 			return res.status(404).json({
 				message: 'Not found',
 			});
 		}
+
+		// Check owner
+		if (req.user._id !== comment.user && req.user.role !== 1) {
+			return res.status(403).json({
+				message: 'Forbidden',
+			});
+		}
+
+		const deletedComment = await Comment.findByIdAndDelete(comment._id);
 		return res.status(200).json({
-			data: deteledComment,
+			data: deletedComment,
 		});
 	} catch (error) {
 		next(error);

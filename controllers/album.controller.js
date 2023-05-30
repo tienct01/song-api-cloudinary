@@ -4,6 +4,7 @@ const path = require('path');
 const Asset = require('../models/Asset.model.js');
 const { isValidObjectId } = require('mongoose');
 
+//! [GET] /albums
 async function getAllAlbums(req, res, next) {
 	try {
 		const albums = await Album.find().populate(['collectionImage', 'songs']);
@@ -14,6 +15,7 @@ async function getAllAlbums(req, res, next) {
 		next(error);
 	}
 }
+//! [GET] /albums/{collectionName}
 async function getAlbum(req, res, next) {
 	try {
 		const { collectionName } = req.params;
@@ -33,6 +35,8 @@ async function getAlbum(req, res, next) {
 		next(error);
 	}
 }
+
+//! [POST] /albums
 async function createAlbum(req, res, next) {
 	try {
 		const { collectionName } = req.body;
@@ -66,6 +70,7 @@ async function createAlbum(req, res, next) {
 	}
 }
 
+//! [POST] /albums/{collectionName}
 async function addAudio(req, res, next) {
 	try {
 		const { collectionName } = req.params;
@@ -99,6 +104,7 @@ async function addAudio(req, res, next) {
 	}
 }
 
+//! [DELETE] /albums/{collectionName}
 async function deleteAlbum(req, res, next) {
 	try {
 		const { collectionName } = req.params;

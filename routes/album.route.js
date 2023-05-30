@@ -19,6 +19,10 @@ router
 		createAlbum
 	);
 
-router.route('/:collectionName').patch(addAudio).get(getAlbum).delete(deleteAlbum);
+router
+	.route('/:collectionName')
+	.patch([passport.authenticate('jwt', { session: false }), isAdmin], addAudio)
+	.get([passport.authenticate('jwt', { session: false }), isAdmin], getAlbum)
+	.delete([passport.authenticate('jwt', { session: false }), isAdmin], deleteAlbum);
 
 module.exports = router;

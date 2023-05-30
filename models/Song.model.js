@@ -34,6 +34,14 @@ const songSchema = new mongoose.Schema(
 				ref: 'Comment',
 			},
 		],
+		views: {
+			type: Number,
+			default: 0,
+		},
+		genre: {
+			type: Schema.Types.ObjectId,
+			ref: 'Genre',
+		},
 	},
 	{
 		timestamps: true,

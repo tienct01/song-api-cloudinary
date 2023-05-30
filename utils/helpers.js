@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 function generateVerifyCode() {
 	const charSet = '1234567890';
 	let verifyCode = '';
@@ -16,8 +18,15 @@ function generateNewPassword() {
 	}
 	return verifyCode;
 }
+async function hashPassword(password) {
+	// Hash password
+	const salt = await bcrypt.genSalt(5);
+	const hashedPassword = await bcrypt.hash(password, salt);
+	return hashedPassword;
+}
 
 module.exports = {
 	generateVerifyCode,
 	generateNewPassword,
+	hashPassword,
 };

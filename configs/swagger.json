@@ -18,12 +18,16 @@
       "description": "bài hát"
     },
     {
-      "name": "albums",
-      "description": "collection"
+      "name": "collections",
+      "description": "Collection"
     },
     {
       "name": "comments",
       "description": "Comment"
+    },
+    {
+      "name": "genres",
+      "description": "Genre"
     }
   ],
   "paths": {
@@ -98,6 +102,32 @@
       }
     },
     "/songs/{id}": {
+      "get": {
+        "summary": "Lấy bài hát theo id",
+        "tags": [
+          "songs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "songs"
@@ -125,6 +155,94 @@
           },
           "404": {
             "description": "Not found"
+          }
+        }
+      }
+    },
+    "/songs/default_thumbnail": {
+      "post": {
+        "summary": "Upload default image cho bai hat",
+        "description": "Admin moi co the upload default image",
+        "tags": [
+          "songs"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "defaultThumbnail": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/collections/topviews": {
+      "get": {
+        "summary": "Lấy top bài hát được nghe nhiều",
+        "tags": [
+          "collections"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/collections/recently_songs": {
+      "get": {
+        "summary": "Lay cac bai hat gan day",
+        "tags": [
+          "collections"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/collections/genre/{genre}": {
+      "get": {
+        "summary": "Lấy bài hát theo thể loại",
+        "tags": [
+          "collections"
+        ],
+        "parameters": [
+          {
+            "name": "genre",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -630,6 +748,50 @@
           }
         }
       }
+    },
+    "/genres": {
+      "get": {
+        "summary": "Thể loại",
+        "tags": [
+          "genres"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "summary": "Tạo thể loại",
+        "tags": [
+          "genres"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "genreName": {
+                    "type": "string",
+                    "example": "Tên thể loại"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -649,8 +811,7 @@
       "Song": {
         "type": "object",
         "required": [
-          "audio",
-          "thumbnail"
+          "audio"
         ],
         "properties": {
           "name": {
@@ -666,6 +827,10 @@
             "type": "string",
             "format": "binary",
             "description": "Thumbnail của bài hát"
+          },
+          "genreId": {
+            "type": "string",
+            "description": "Id cua genre"
           }
         }
       },

@@ -1,7 +1,8 @@
 const express = require('express');
 const passport = require('passport');
-const { createSong, getAllSongs, deleteSong } = require('../controllers/song.controller.js');
-const { isUser, isOwner } = require('../middlewares/authMiddlewares.js');
+const { createSong, getAllSongs, deleteSong, getSong, getTopViews, getByGenre, uploadDefaultThumbnail } = require('../controllers/song.controller.js');
+const { isUser, isAdmin } = require('../middlewares/authMiddlewares.js');
+const { validateParams, schemas } = require('../middlewares/validate.js');
 const upload = require('../middlewares/multer.js');
 const router = express.Router();
 
@@ -22,6 +23,11 @@ router
 		createSong
 	)
 	.get(getAllSongs);
-router.route('/:id').delete([passport.authenticate('jwt', { session: false }), isOwner], deleteSong);
+router
+	.route('/:id')
+	.delete([validateParams(schemas.pathId, 'id')], [passport.authenticate('jwt', { session: false }), isUser], deleteSong)
+	.get([validateParams(schemas.pathId, 'id')], [passport.authenticate('jwt', { session: false }), isUser], getSong);
+
+router.post('/default_thumbnail', [passport.authenticate('jwt', { session: false }), isAdmin], upload.single('defaultThumbnail'), uploadDefaultThumbnail);
 
 module.exports = router;

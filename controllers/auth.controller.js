@@ -2,7 +2,7 @@ const User = require('../models/User.model.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { sendVerifyCode, sendResetPassword } = require('../configs/nodemailer.js');
-const { generateVerifyCode, generateNewPassword } = require('../utils/helpers.js');
+const { generateVerifyCode, generateNewPassword, hashPassword } = require('../utils/helpers.js');
 const VerifyCode = require('../models/VerifyCode.model.js');
 
 //! [POST] /register
@@ -18,10 +18,12 @@ async function signUp(req, res, next) {
 				message: 'Email existed',
 			});
 		}
+
 		const newUser = new User({
 			name: name,
 			email: email,
-			password: password,
+			password: await hashPassword(password),
+			verified: true,
 		});
 
 		await newUser.save();
@@ -177,7 +179,7 @@ async function resetPassword(req, res, next) {
 			});
 		}
 		const newPassword = generateNewPassword();
-		user.password = newPassword;
+		user.password = await hashPassword(newPassword);
 		await user.save();
 		await sendResetPassword(email, newPassword);
 
@@ -211,13 +213,20 @@ async function myProfile(req, res, next) {
 //! [PATCH] /change_password
 async function changePassword(req, res, next) {
 	try {
-		const { id } = req.query;
+		const { userId } = req.query;
 		const { oldPassword, newPassword } = req.body;
 
-		const user = await User.findById(id);
+		const user = await User.findById(userId);
 		if (!user) {
 			return res.status(404).json({
 				message: 'User not found',
+			});
+		}
+
+		// Check is owner or not
+		if (req.user._id !== user._id) {
+			return res.status(403).json({
+				message: 'Forbidden',
 			});
 		}
 
@@ -228,7 +237,7 @@ async function changePassword(req, res, next) {
 			});
 		}
 
-		user.password = newPassword;
+		user.password = await hashPassword(newPassword);
 		await user.save();
 
 		return res.status(200).json({

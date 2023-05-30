@@ -7,12 +7,6 @@ const genreSchema = new mongoose.Schema(
 			required: true,
 			unique: true,
 		},
-		songs: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Song',
-			},
-		],
 	},
 	{
 		versionKey: false,

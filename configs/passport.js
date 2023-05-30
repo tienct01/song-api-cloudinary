@@ -14,6 +14,7 @@ passport.use(
 			if (!user) {
 				done('User does not exist', false);
 			} else {
+				console.log('User', user);
 				done(null, user);
 			}
 		}

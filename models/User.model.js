@@ -16,12 +16,6 @@ const userSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		tracks: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Song',
-			},
-		],
 		avatar: {
 			type: Schema.Types.ObjectId,
 			ref: 'Asset',
@@ -35,17 +29,25 @@ const userSchema = new Schema(
 			type: Number,
 			default: 2,
 		},
+		// // Bài hát đã upload của người dùng
+		// tracks: [
+		// 	{
+		// 		type: Schema.Types.ObjectId,
+		// 		ref: 'Song',
+		// 	},
+		// ],
+		// Bài hát đã nghe gần đây
+		recently: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Song',
+			},
+		],
 	},
 	{
 		timestamps: true,
 	}
 );
-
-userSchema.pre('save', async function (next) {
-	const salt = await bcrypt.genSalt(5);
-	this.password = await bcrypt.hash(this.password, salt);
-	next();
-});
 
 const User = model('User', userSchema);
 module.exports = User;

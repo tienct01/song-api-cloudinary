@@ -159,11 +159,6 @@ async function deleteSong(req, res, next) {
 		}
 
 		const deletedSong = await Song.findByIdAndDelete(id);
-		destroyAsset(deletedSong.audio.public_id, 'video');
-		destroyAsset(deletedSong.thumbnail.public_id, 'image');
-
-		Asset.findByIdAndDelete(deletedSong.audio._id);
-		Asset.findByIdAndDelete(deletedSong.thumbnail._id);
 
 		return res.status(200).json({
 			data: deletedSong,

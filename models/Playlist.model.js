@@ -5,6 +5,10 @@ const playlistSchema = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
+	thumbnail: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Asset',
+	},
 	user: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User',

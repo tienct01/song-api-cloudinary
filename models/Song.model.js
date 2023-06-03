@@ -1,5 +1,8 @@
 const { Schema } = require('mongoose');
 const mongoose = require('mongoose');
+const Comment = require('../models/Comment.model.js');
+const Asset = require('../models/Asset.model.js');
+const { destroyAsset } = require('../configs/cloudinaryServices.js');
 
 const songSchema = new mongoose.Schema(
 	{
@@ -47,6 +50,29 @@ const songSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
+
+songSchema.post('findOneAndDelete', (doc, next) => {
+	// delete all comments
+	doc.comment.forEach((commentId) => {
+		Comment.findOneAndDelete({
+			_id: commentId,
+		});
+	});
+
+	// remove asset
+	Asset.findOneAndDelete({
+		_id: doc.audio,
+	}).then((res) => {
+		destroyAsset(res.public_id, 'video');
+	});
+	Asset.findOneAndDelete({
+		_id: doc.thumbnail,
+	}).then((res) => {
+		destroyAsset(res.public_id, 'image');
+	});
+
+	next();
+});
 
 const Song = mongoose.model('Song', songSchema);
 module.exports = Song;

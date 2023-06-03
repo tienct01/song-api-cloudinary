@@ -29,14 +29,6 @@ const userSchema = new Schema(
 			type: Number,
 			default: 2,
 		},
-		// // Bài hát đã upload của người dùng
-		// tracks: [
-		// 	{
-		// 		type: Schema.Types.ObjectId,
-		// 		ref: 'Song',
-		// 	},
-		// ],
-		// Bài hát đã nghe gần đây
 		recently: [
 			{
 				type: Schema.Types.ObjectId,

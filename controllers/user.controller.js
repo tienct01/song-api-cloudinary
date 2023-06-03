@@ -1,3 +1,4 @@
+const Song = require('../models/Song.model.js');
 const User = require('../models/User.model.js');
 
 //! [GET] /recently_songs
@@ -40,6 +41,33 @@ async function getRecentlySongs(req, res, next) {
 	}
 }
 
+async function getTracks(req, res, next) {
+	try {
+		const id = req.user._id;
+		const songs = await Song.find({
+			artist: id,
+		})
+			.populate({
+				path: 'artist',
+				select: 'name _id',
+			})
+			.populate({
+				path: 'audio',
+				select: 'url createdAt',
+			})
+			.populate({
+				path: 'thumbnail',
+				select: 'url',
+			});
+
+		return res.status(200).json({
+			data: songs,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
 module.exports = {
 	getRecentlySongs,
+	getTracks,
 };

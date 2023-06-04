@@ -152,7 +152,7 @@ async function deleteSong(req, res, next) {
 		}
 
 		// Check artist
-		if (req.user._id !== song.artist && req.user.role !== 1) {
+		if (!song.artist.equals(req.user._id) && req.user.role !== 1) {
 			return res.status(403).json({
 				message: 'Forbidden',
 			});

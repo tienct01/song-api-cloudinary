@@ -213,7 +213,7 @@ async function myProfile(req, res, next) {
 //! [PATCH] /change_password
 async function changePassword(req, res, next) {
 	try {
-		const { userId } = req.query;
+		const userId = req.user._id;
 		const { oldPassword, newPassword } = req.body;
 
 		const user = await User.findById(userId);
@@ -222,9 +222,8 @@ async function changePassword(req, res, next) {
 				message: 'User not found',
 			});
 		}
-
 		// Check is owner or not
-		if (req.user._id !== user._id) {
+		if (!user._id.equals(userId)) {
 			return res.status(403).json({
 				message: 'Forbidden',
 			});

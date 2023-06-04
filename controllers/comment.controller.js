@@ -88,7 +88,7 @@ async function editComment(req, res, next) {
 		}
 
 		// Check is author or not
-		if (req.user._id !== comment.user && req.user.role !== 1) {
+		if (!comment.user.equals(req.user._id) && req.user.role !== 1) {
 			return res.status(403).json({
 				message: 'Forbidden',
 			});
@@ -118,7 +118,7 @@ async function deleteComment(req, res, next) {
 		}
 
 		// Check owner
-		if (req.user._id !== comment.user && req.user.role !== 1) {
+		if (!comment.user.equals(req.user._id) && req.user.role !== 1) {
 			return res.status(403).json({
 				message: 'Forbidden',
 			});

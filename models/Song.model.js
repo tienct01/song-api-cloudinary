@@ -74,5 +74,8 @@ songSchema.post('findOneAndDelete', (doc, next) => {
 	next();
 });
 
+songSchema.pre('findOne', { query: true, document: false }, (next) => {
+	// console.log(this);
+});
 const Song = mongoose.model('Song', songSchema);
 module.exports = Song;

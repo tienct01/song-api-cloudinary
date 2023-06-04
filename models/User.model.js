@@ -22,7 +22,7 @@ const userSchema = new Schema(
 		},
 		verified: {
 			type: Boolean,
-			default: false,
+			default: true,
 		},
 		// 2 - user, 1 - admin
 		role: {

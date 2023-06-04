@@ -60,22 +60,33 @@ songSchema.post('findOneAndDelete', (doc, next) => {
 	});
 
 	// remove asset
-	Asset.findOneAndDelete({
-		_id: doc.audio,
-	}).then((res) => {
+	Asset.findOneAndDelete({ _id: doc.audio }).then((res) => {
 		destroyAsset(res.public_id, 'video');
 	});
-	Asset.findOneAndDelete({
-		_id: doc.thumbnail,
-	}).then((res) => {
+	Asset.findOneAndDelete({ _id: doc.thumbnail }).then((res) => {
 		destroyAsset(res.public_id, 'image');
 	});
 
 	next();
 });
 
-songSchema.pre('findOne', { query: true, document: false }, (next) => {
-	// console.log(this);
+// Populate single doc
+songSchema.post('findOne', async (doc, next) => {
+	await doc.populate('artist', 'name _id', 'User');
+	await doc.populate('audio', 'url -_id', 'Asset');
+	await doc.populate('thumbnail', 'url -_id', 'Asset');
+	next();
 });
+
+// Populate many docs
+songSchema.post('find', async (docs, next) => {
+	for (let i = 0; i < docs.length; i++) {
+		await docs[i].populate('artist', 'name _id', 'User');
+		await docs[i].populate('audio', 'url -_id', 'Asset');
+		await docs[i].populate('thumbnail', 'url -_id', 'Asset');
+	}
+	next();
+});
+
 const Song = mongoose.model('Song', songSchema);
 module.exports = Song;

@@ -1,4 +1,5 @@
 const Song = require('../models/Song.model.js');
+const Genre = require('../models/Genre.model.js');
 const { uploadAsset, getAssetAttachment, destroyAsset } = require('../configs/cloudinaryServices.js');
 const path = require('path');
 const Asset = require('../models/Asset.model.js');
@@ -23,19 +24,7 @@ async function getAllSongs(req, res, next) {
 				updatedAt: 'desc',
 			})
 			.skip((page - 1) * limit)
-			.limit(limit)
-			.populate({
-				path: 'artist',
-				select: 'name _id',
-			})
-			.populate({
-				path: 'audio',
-				select: 'url createdAt',
-			})
-			.populate({
-				path: 'thumbnail',
-				select: 'url',
-			});
+			.limit(limit);
 
 		const songCount = await Song.count().exec();
 		let totalPage;
@@ -186,24 +175,43 @@ async function getByGenre(req, res, next) {
 	try {
 		const { genre } = req.params;
 
-		let song = await Song.aggregate([
+		let song = await Genre.aggregate([
 			{
-				$lookup: {
-					from: 'genres',
-					localField: 'genre',
-					foreignField: '_id',
-					as: 'genre',
+				$match: {
+					genreName: genre,
 				},
 			},
 			{
-				$match: {
-					'genre.genreName': genre,
+				$lookup: {
+					from: 'songs',
+					localField: '_id',
+					foreignField: 'genre',
+					pipeline: [
+						{
+							$project: {
+								_id: true,
+							},
+						},
+					],
+					as: 'songs',
 				},
 			},
 		]);
 
+		if (song.length === 0) {
+			return res.status(404).json({
+				message: 'Genre not found',
+			});
+		}
+
+		const result = song[0];
+		if (result.songs) {
+			for (let i = 0; i < result.songs.length; i++) {
+				result.songs[i] = await Song.findById(result.songs[i]._id);
+			}
+		}
 		return res.status(200).json({
-			data: song,
+			data: result,
 		});
 	} catch (error) {
 		next(error);

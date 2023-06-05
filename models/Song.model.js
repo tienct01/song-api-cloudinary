@@ -57,6 +57,7 @@ songSchema.post('findOneAndDelete', async (doc, next) => {
 		await Asset.findById(doc.thumbnail).then((res) => {
 			if (!res.isDefault) {
 				res.deleteOne();
+				destroyAsset(res.public_id, 'image');
 			}
 		});
 

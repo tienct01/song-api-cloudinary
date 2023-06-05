@@ -9,12 +9,13 @@ async function createPlaylist(req, res, next) {
 		const { name } = req.body;
 		const userId = req.user._id;
 
+		console.log('name', name);
 		const defaultAsset = await Asset.findOne({
 			isDefault: true,
 		});
 
 		const newPlaylist = await Playlist.create({
-			name: name,
+			name: name || 'New Playlist',
 			thumbnail: defaultAsset._id,
 			user: userId,
 		});
@@ -39,7 +40,10 @@ async function getUserPlaylists(req, res, next) {
 
 		const playlists = await Playlist.find({
 			user: userId,
-		}).populate('thumbnail');
+		});
+		playlists.forEach((val) => {
+			val.depopulate('songs');
+		});
 
 		return res.status(200).json({
 			data: playlists,
@@ -73,34 +77,14 @@ async function getPlaylistById(req, res, next) {
 	}
 }
 
-//! [GET] /playlists/{id}/songs
-async function getSongOfPlaylist(req, res, next) {
+//! [PATCH] /playlists/{id}
+async function editPlaylist(req, res, next) {
 	try {
 		const { id } = req.params;
+		const { name } = req.body;
+		const userId = req.user._id;
 
-		if (!isValidObjectId(id)) {
-			return res.status(400).json({
-				message: 'Invalid Id',
-			});
-		}
-
-		const playlist = await Playlist.findById(id, 'songs').populate({
-			path: 'songs',
-			populate: [
-				{
-					path: 'artist',
-					select: 'name _id',
-				},
-				{
-					path: 'audio',
-					select: 'url createdAt',
-				},
-				{
-					path: 'thumbnail',
-					select: 'url',
-				},
-			],
-		});
+		const playlist = await Playlist.findById(id);
 
 		if (!playlist) {
 			return res.status(404).json({
@@ -108,23 +92,20 @@ async function getSongOfPlaylist(req, res, next) {
 			});
 		}
 
-		return res.status(200).json({
-			data: playlist.songs,
-		});
-	} catch (error) {
-		next(error);
-	}
-}
+		if (!playlist.user.equals(userId)) {
+			return res.status(403).json({
+				message: 'Forbidden',
+			});
+		}
 
-//! [PATCH] /playlists/{id}
-async function editPlaylist(req, res, next) {
-	try {
-		const { id } = req.params;
-		const { name } = req.body;
+		const updated = await Playlist.findByIdAndUpdate(
+			id,
+			{
+				name: name,
+			},
+			{ new: true }
+		);
 
-		const updated = await Playlist.findByIdAndUpdate(id, {
-			name: name,
-		});
 		if (!updated) {
 			return res.status(404).json({
 				message: 'Playlist not found',
@@ -144,6 +125,7 @@ async function addSongToPlaylist(req, res, next) {
 	try {
 		const { id } = req.params;
 		const { songId } = req.body;
+		const userId = req.user._id;
 
 		if (!isValidObjectId(songId)) {
 			return res.status(400).json({
@@ -157,7 +139,15 @@ async function addSongToPlaylist(req, res, next) {
 				message: 'Playlist not found',
 			});
 		}
-		const song = await Song.findById(id).populate('thumbnail');
+
+		if (!playlist.user.equals(userId)) {
+			return res.status(403).json({
+				message: 'Forbidden',
+			});
+		}
+
+		const song = await Song.findById(songId);
+		song.depopulate();
 		if (!song) {
 			return res.status(404).json({
 				message: 'Song not found',
@@ -165,11 +155,12 @@ async function addSongToPlaylist(req, res, next) {
 		}
 
 		// Get the thumbnail of the new song
-		if (!playlist.songs.includes(songId)) {
+		const isSongIdExist = playlist.songs.some((id) => id.equals(songId));
+		if (!isSongIdExist) {
 			playlist.songs = [...playlist.songs, songId];
-			playlist.thumbnail = song.thumbnail._id;
+			playlist.thumbnail = song.thumbnail;
+			await playlist.save();
 		}
-		await playlist.save();
 
 		return res.status(200).json({
 			data: playlist,
@@ -184,6 +175,7 @@ async function deleteSongFromPlaylist(req, res, next) {
 	try {
 		const { id } = req.params;
 		const { songId } = req.body;
+		const userId = req.user._id;
 
 		if (!isValidObjectId(songId)) {
 			return res.status(400).json({
@@ -191,24 +183,38 @@ async function deleteSongFromPlaylist(req, res, next) {
 			});
 		}
 
-		const playlist = await Playlist.findById(id);
+		let playlist = await Playlist.findById(id);
 		if (!playlist) {
 			return res.status(404).json({
 				message: 'Playlist not found',
 			});
 		}
-		const song = await Song.findById(playlist.songs[0]).populate('thumbnail');
-		if (!song) {
-			return res.status(404).json({
-				message: 'Song not found',
+
+		if (!playlist.user.equals(userId)) {
+			return res.status(403).json({
+				message: 'Forbidden',
 			});
 		}
 
-		const index = playlist.songs.findIndex(songId);
-		if (index !== -1) {
-			playlist.songs.splice(index, 1);
-			playlist.thumbnail = song.thumbnail._id;
-			await playlist.save();
+		const isSongIdExist = playlist.songs.some((val) => val.equals(songId));
+
+		if (isSongIdExist) {
+			playlist = await Playlist.findByIdAndUpdate(
+				id,
+				{
+					$pull: {
+						songs: songId,
+					},
+				},
+				{ new: true }
+			);
+
+			let song = await Song.findById(playlist.songs[0]);
+			if (song) {
+				song.depopulate();
+				playlist.thumbnail = song.thumbnail;
+				await playlist.save();
+			}
 		}
 
 		return res.status(200).json({
@@ -218,12 +224,47 @@ async function deleteSongFromPlaylist(req, res, next) {
 		next(error);
 	}
 }
+
+//! [DELETE] /playlists/:id
+async function deletePlaylist(req, res, next) {
+	try {
+		const { id } = req.params;
+		const userId = req.user._id;
+
+		if (!isValidObjectId(id)) {
+			return res.status(400).json({
+				message: 'Invalid playlist id',
+			});
+		}
+
+		const playlist = await Playlist.findById(id);
+		if (!playlist) {
+			return res.status(404).json({
+				message: 'Playlist not found',
+			});
+		}
+
+		if (!playlist.user.equals(userId)) {
+			return res.status(403).json({
+				message: 'Forbidden',
+			});
+		}
+
+		await playlist.deleteOne();
+
+		return res.status(200).json({
+			message: 'Success',
+		});
+	} catch (error) {
+		next(error);
+	}
+}
 module.exports = {
 	createPlaylist,
 	getUserPlaylists,
 	getPlaylistById,
-	getSongOfPlaylist,
 	editPlaylist,
 	addSongToPlaylist,
 	deleteSongFromPlaylist,
+	deletePlaylist,
 };

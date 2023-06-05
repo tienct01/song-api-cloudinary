@@ -11,23 +11,19 @@ async function getComments(req, res, next) {
 				message: 'Invalid id',
 			});
 		}
-		const song = await Song.findById(songId, {
-			comment: true,
-		}).populate({
-			path: 'comment',
-			populate: {
-				path: 'user',
-				select: '_id name',
+		const comments = await Comment.find(
+			{
+				song: songId,
 			},
-		});
+			'-song'
+		)
+			.sort({
+				createdAt: 'desc',
+			})
+			.populate('user', '-password -playlist -recently -tracks');
 
-		if (!song) {
-			return res.status(404).json({
-				message: 'Not found',
-			});
-		}
 		return res.status(200).json({
-			data: song.comment,
+			data: comments,
 		});
 	} catch (error) {
 		next(error);
@@ -44,30 +40,17 @@ async function createComment(req, res, next) {
 				message: 'Field required',
 			});
 		}
-		const song = await Song.findById(songId);
-		if (!song) {
-			return res.status(404).json({
-				message: 'Song not found',
-			});
-		}
-		const user = await User.findById(userId);
-		if (!user) {
-			return res.status(404).json({
-				message: 'User not found',
-			});
-		}
 
 		const newComment = new Comment({
 			text: text,
 			user: userId,
+			song: songId,
 		});
 		await newComment.save();
-
-		song.comment.push(newComment);
-		await song.save();
+		await newComment.populate('user', '-password -playlist -recently -tracks');
 
 		return res.status(200).json({
-			data: song,
+			data: newComment,
 		});
 	} catch (error) {
 		next(error);
@@ -96,6 +79,7 @@ async function editComment(req, res, next) {
 
 		comment.text = text;
 		await comment.save();
+		await comment.populate('user', '-password -playlist -recently -tracks');
 
 		return res.status(200).json({
 			data: comment,

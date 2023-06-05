@@ -2,6 +2,8 @@ const { Schema } = require('mongoose');
 const mongoose = require('mongoose');
 const Comment = require('../models/Comment.model.js');
 const Asset = require('../models/Asset.model.js');
+const User = require('../models/User.model.js');
+const Playlist = require('../models/Playlist.model.js');
 const { destroyAsset } = require('../configs/cloudinaryServices.js');
 
 const songSchema = new mongoose.Schema(
@@ -31,12 +33,6 @@ const songSchema = new mongoose.Schema(
 			ref: 'Asset',
 			required: true,
 		},
-		comment: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Comment',
-			},
-		],
 		views: {
 			type: Number,
 			default: 0,
@@ -51,39 +47,77 @@ const songSchema = new mongoose.Schema(
 	}
 );
 
-songSchema.post('findOneAndDelete', (doc, next) => {
-	// delete all comments
-	doc.comment.forEach((commentId) => {
-		Comment.findOneAndDelete({
-			_id: commentId,
+songSchema.post('findOneAndDelete', async (doc, next) => {
+	if (doc) {
+		// remove asset
+		await Asset.findOneAndDelete({ _id: doc.audio }).then((res) => {
+			destroyAsset(res.public_id, 'video');
 		});
-	});
 
-	// remove asset
-	Asset.findOneAndDelete({ _id: doc.audio }).then((res) => {
-		destroyAsset(res.public_id, 'video');
-	});
-	Asset.findOneAndDelete({ _id: doc.thumbnail }).then((res) => {
-		destroyAsset(res.public_id, 'image');
-	});
+		await Asset.findById(doc.thumbnail).then((res) => {
+			if (!res.isDefault) {
+				res.deleteOne();
+			}
+		});
+
+		// remove from recently list
+		await User.updateMany(
+			{},
+			{
+				$pull: {
+					recently: {
+						$in: [doc._id],
+					},
+				},
+			},
+			{ multi: true }
+		).catch((err) => {
+			throw err;
+		});
+		// remove comment
+		await Comment.deleteMany({
+			song: doc._id,
+		}).catch((err) => {
+			throw err;
+		});
+
+		//remove in playlist
+		await Playlist.updateMany(
+			{},
+			{
+				$pull: {
+					songs: doc._id,
+				},
+			},
+			{
+				multi: true,
+			}
+		).catch((err) => {
+			throw err;
+		});
+	}
 
 	next();
 });
 
 // Populate single doc
 songSchema.post('findOne', async (doc, next) => {
-	await doc.populate('artist', 'name _id', 'User');
-	await doc.populate('audio', 'url -_id', 'Asset');
-	await doc.populate('thumbnail', 'url -_id', 'Asset');
+	if (doc) {
+		await doc.populate('artist', 'name _id', 'User');
+		await doc.populate('audio', 'url -_id', 'Asset');
+		await doc.populate('thumbnail', 'url -_id', 'Asset');
+	}
 	next();
 });
 
 // Populate many docs
 songSchema.post('find', async (docs, next) => {
 	for (let i = 0; i < docs.length; i++) {
-		await docs[i].populate('artist', 'name _id', 'User');
-		await docs[i].populate('audio', 'url -_id', 'Asset');
-		await docs[i].populate('thumbnail', 'url -_id', 'Asset');
+		if (docs[i]) {
+			await docs[i].populate('artist', 'name _id', 'User');
+			await docs[i].populate('audio', 'url -_id', 'Asset');
+			await docs[i].populate('thumbnail', 'url -_id', 'Asset');
+		}
 	}
 	next();
 });

@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const Song = require('./Song.model.js');
 
 const commentSchema = new Schema(
 	{
@@ -10,6 +11,10 @@ const commentSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 		},
+		song: {
+			type: Schema.Types.ObjectId,
+			ref: 'Song',
+		},
 	},
 	{
 		timestamps: true,
@@ -17,6 +22,16 @@ const commentSchema = new Schema(
 	}
 );
 
+commentSchema.post('deleteOne', (doc, next) => {
+	Song.aggregate([
+		{
+			$pull: {
+				comments: doc._id,
+			},
+		},
+	]);
+	next();
+});
 const Comment = model('Comment', commentSchema);
 
 module.exports = Comment;

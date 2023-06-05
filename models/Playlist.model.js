@@ -21,6 +21,30 @@ const playlistSchema = new mongoose.Schema({
 	],
 });
 
+playlistSchema.post('find', async (docs, next) => {
+	for (let doc of docs) {
+		if (doc) {
+			await doc.populate('songs');
+			await doc.populate('thumbnail', 'url -_id');
+		}
+	}
+	next();
+});
+playlistSchema.post('findOne', async (doc, next) => {
+	if (doc) {
+		await doc.populate('songs');
+		await doc.populate('thumbnail', 'url -_id');
+	}
+	next();
+});
+playlistSchema.post('save', async (doc, next) => {
+	if (doc) {
+		console.log('docsss', doc);
+		await doc.populate('songs');
+		await doc.populate('thumbnail', 'url -_id');
+	}
+});
+
 const Playlist = mongoose.model('Playlist', playlistSchema);
 
 module.exports = Playlist;

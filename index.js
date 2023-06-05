@@ -13,6 +13,7 @@ const commentRouter = require('./routes/comment.route.js');
 const genreRouter = require('./routes/genre.route.js');
 const userRouter = require('./routes/user.route.js');
 const collectionRouter = require('./routes/collections.route.js');
+const playlistRouter = require('./routes/playlist.route.js');
 
 // Config database
 require('./configs/mongodb.js');
@@ -33,6 +34,7 @@ swaggerDocs.servers.push({
 	url: process.env.SERVER_URL,
 	description: 'API',
 });
+
 // swagger ui
 app.use('/apis', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 // song api
@@ -47,6 +49,8 @@ app.use('/comments', commentRouter);
 app.use('/genres', genreRouter);
 // collection api
 app.use('/collections', collectionRouter);
+// playlist api
+app.use('/playlists', playlistRouter);
 
 app.use(errorHanlder);
 

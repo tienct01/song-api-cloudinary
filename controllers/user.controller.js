@@ -12,26 +12,7 @@ async function getRecentlySongs(req, res, next) {
 				message: 'User not found',
 			});
 		}
-		await user.populate({
-			path: 'recently',
-			populate: [
-				{
-					path: 'artist',
-					select: 'name _id',
-					model: 'User',
-				},
-				{
-					path: 'audio',
-					select: 'url createdAt',
-					model: 'Asset',
-				},
-				{
-					path: 'thumbnail',
-					select: 'url',
-					model: 'Asset',
-				},
-			],
-		});
+		await user.populate('recently');
 
 		return res.status(200).json({
 			data: user.recently,

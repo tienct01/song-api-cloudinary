@@ -32,7 +32,7 @@ async function sendResetPassword(email, newPassword) {
 			resetPassword: newPassword,
 		});
 		return transporter.sendMail({
-			from: 'Music App ' + process.env.GOOGLE_USER,
+			from: process.env.GOOGLE_USER,
 			to: email,
 			html: html,
 			subject: 'Music App',

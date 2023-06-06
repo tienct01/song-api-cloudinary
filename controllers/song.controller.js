@@ -11,7 +11,7 @@ const { isValidObjectId } = require('mongoose');
 async function getAllSongs(req, res, next) {
 	try {
 		const { q = '', page = 1, limit = 5 } = req.query;
-		const songs = await Song.find()
+		const songs = await Song.find({})
 			.or([
 				{
 					'artist.name': { $regex: q, $options: 'i' },

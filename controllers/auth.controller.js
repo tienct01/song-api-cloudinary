@@ -53,7 +53,7 @@ async function signIn(req, res, next) {
 
 		if (!user) {
 			return res.status(404).json({
-				message: "Accout doesn't exist",
+				message: "Account doesn't exist",
 			});
 		}
 		const match = await user.comparePassword(password);

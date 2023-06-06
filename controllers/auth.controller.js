@@ -22,7 +22,7 @@ async function signUp(req, res, next) {
 		const newUser = new User({
 			name: name,
 			email: email,
-			password: await hashPassword(password),
+			password: password,
 			verified: true,
 		});
 
@@ -56,7 +56,7 @@ async function signIn(req, res, next) {
 				message: "Accout doesn't exist",
 			});
 		}
-		const match = await bcrypt.compare(password, user.password);
+		const match = await user.comparePassword(password);
 
 		if (!match) {
 			return res.status(400).json({
@@ -179,7 +179,7 @@ async function resetPassword(req, res, next) {
 			});
 		}
 		const newPassword = generateNewPassword();
-		user.password = await hashPassword(newPassword);
+		user.password = newPassword;
 		await user.save();
 		await sendResetPassword(email, newPassword);
 
@@ -236,7 +236,7 @@ async function changePassword(req, res, next) {
 			});
 		}
 
-		user.password = await hashPassword(newPassword);
+		user.password = newPassword;
 		await user.save();
 
 		return res.status(200).json({

@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 const bcrypt = require('bcrypt');
+const { hashPassword } = require('../utils/helpers.js');
 
 const userSchema = new Schema(
 	{
@@ -40,6 +41,17 @@ const userSchema = new Schema(
 		timestamps: true,
 	}
 );
+
+userSchema.pre('save', async function (next) {
+	if (!this.isModified('password')) {
+		next();
+	}
+	this.password = await hashPassword(this.password);
+});
+
+userSchema.methods.comparePassword = function (password) {
+	return bcrypt.compare(password, this.password);
+};
 
 const User = model('User', userSchema);
 module.exports = User;

@@ -39,6 +39,6 @@ router
 
 router.post('/default_thumbnail', [passport.authenticate('jwt', { session: false }), isAdmin], upload.single('defaultThumbnail'), uploadDefaultThumbnail);
 
-router.post('/add_many_song', [passport.authenticate('jwt', { session: false }), isAdmin], upload.single('dataCsv'), addMultipleSong);
+// router.post('/add_many_song', [passport.authenticate('jwt', { session: false }), isAdmin], upload.single('dataCsv'), addMultipleSong);
 
 module.exports = router;

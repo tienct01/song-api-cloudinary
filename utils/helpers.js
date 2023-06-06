@@ -25,8 +25,23 @@ async function hashPassword(password) {
 	return hashedPassword;
 }
 
+function parseCsv(musicCsv = '') {
+	const rows = musicCsv.split(/\n/);
+	let cols = rows.splice(0, 1);
+	cols = cols[0].split(',');
+	const res = rows.map((row) => {
+		let [image, audio] = row.split(',');
+		return {
+			[cols[0]]: image,
+			[cols[1]]: audio,
+		};
+	});
+	return res;
+}
+
 module.exports = {
 	generateVerifyCode,
 	generateNewPassword,
 	hashPassword,
+	parseCsv,
 };

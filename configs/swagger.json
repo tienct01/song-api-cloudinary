@@ -197,39 +197,6 @@
         }
       }
     },
-    "/songs/add_many_song": {
-      "post": {
-        "summary": "Add nhieu bat hat",
-        "tags": [
-          "songs"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "dataCsv": {
-                    "type": "string",
-                    "format": "base64"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/collections/topviews": {
       "get": {
         "summary": "Lấy top bài hát được nghe nhiều",
@@ -311,7 +278,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "$ref": "#/components/schemas/User"
               }

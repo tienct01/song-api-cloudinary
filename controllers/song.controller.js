@@ -6,7 +6,6 @@ const Asset = require('../models/Asset.model.js');
 const songServices = require('../services/songServices.js');
 const userServices = require('../services/userServices.js');
 const { isValidObjectId } = require('mongoose');
-const fs = require('fs/promises');
 
 //! [GET] /songs
 async function getAllSongs(req, res, next) {
@@ -245,19 +244,6 @@ async function uploadDefaultThumbnail(req, res, next) {
 	}
 }
 
-async function addMultipleSong(req, res, next) {
-	try {
-		const data = await fs.readFile(req.file.path, {
-			encoding: 'utf8',
-		});
-		console.log('data', data);
-		return res.json({
-			data: req.file,
-		});
-	} catch (error) {
-		next(error);
-	}
-}
 module.exports = {
 	createSong,
 	getAllSongs,
@@ -266,5 +252,4 @@ module.exports = {
 	deleteSong,
 	getByGenre,
 	uploadDefaultThumbnail,
-	addMultipleSong,
 };

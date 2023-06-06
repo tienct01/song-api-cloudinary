@@ -22,7 +22,7 @@ const commentSchema = new Schema(
 	}
 );
 
-commentSchema.post('deleteOne', (doc, next) => {
+commentSchema.post('deleteOne', function (doc, next) {
 	Song.aggregate([
 		{
 			$pull: {

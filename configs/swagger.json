@@ -757,13 +757,28 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
             "schema": {
               "type": "string"
             },
             "required": true
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ten playlist"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success"

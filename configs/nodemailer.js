@@ -16,7 +16,7 @@ async function sendVerifyCode(email, verifyCode) {
 			verifyCode: verifyCode,
 		});
 		return transporter.sendMail({
-			from: process.env.GOOGLE_USER,
+			from: `[Music App] ${process.env.GOOGLE_USER}`,
 			to: email,
 			html: html,
 			subject: 'Music App',

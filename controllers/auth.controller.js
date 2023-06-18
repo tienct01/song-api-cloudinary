@@ -194,9 +194,7 @@ async function resetPassword(req, res, next) {
 async function myProfile(req, res, next) {
 	try {
 		const { id } = req.query;
-		const myProfile = await User.findById(id, '-password').populate({
-			path: 'tracks',
-		});
+		const myProfile = await User.findById(id, '-password');
 		if (!myProfile) {
 			return res.status(404).json({
 				message: 'User not found',

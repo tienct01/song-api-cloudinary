@@ -9,6 +9,10 @@ class UserServices {
 				user.recently.splice(19, 1);
 			}
 			user.recently = [songId, ...user.recently];
+		} else {
+			const index = user.recently.indexOf(songId);
+			user.recently.splice(index, 1);
+			user.recently = [songId, ...user.recently];
 		}
 
 		return user.save();

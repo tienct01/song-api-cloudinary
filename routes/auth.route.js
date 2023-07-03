@@ -1,8 +1,9 @@
 const express = require('express');
-const { signIn, signUp, sendVerify, resetPassword, myProfile, verifyAccount, changePassword } = require('../controllers/auth.controller.js');
+const { signIn, signUp, sendVerify, resetPassword, myProfile, verifyAccount, changePassword, updateProfile } = require('../controllers/auth.controller.js');
 const passport = require('passport');
 const { validateBody, schemas, validateQueryParams } = require('../middlewares/validate.js');
 const { isUser } = require('../middlewares/authMiddlewares.js');
+const upload = require('../middlewares/multer.js');
 const authRouter = express.Router();
 
 authRouter.get('/login', validateQueryParams(schemas.loginBody), signIn);
@@ -17,5 +18,6 @@ authRouter.patch(
 	changePassword
 );
 authRouter.get('/my_profile', validateQueryParams(schemas.queryId), myProfile);
+authRouter.patch('/update_profile', [passport.authenticate('jwt', { session: false }), isUser], upload.single('avatar'), updateProfile);
 
 module.exports = authRouter;

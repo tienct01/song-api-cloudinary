@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const { sendVerifyCode, sendResetPassword } = require('../configs/nodemailer.js');
 const { generateVerifyCode, generateNewPassword, hashPassword } = require('../utils/helpers.js');
 const VerifyCode = require('../models/VerifyCode.model.js');
+const { destroyAsset, uploadAsset } = require('../configs/cloudinaryServices.js');
+const Asset = require('../models/Asset.model.js');
+const path = require('path');
 
 //! [POST] /register
 async function signUp(req, res, next) {
@@ -48,7 +51,7 @@ async function signIn(req, res, next) {
 			{
 				email: email,
 			},
-			'-tracks -__v -name -email -verified -role'
+			'-tracks -__v -verified -role'
 		);
 
 		if (!user) {
@@ -245,6 +248,35 @@ async function changePassword(req, res, next) {
 	}
 }
 
+async function updateProfile(req, res, next) {
+	try {
+		const { name } = req.body;
+		const newAvatar = req.file;
+
+		if (name && name?.trim() !== '') {
+			req.user.name = name;
+		}
+		if (newAvatar) {
+			destroyAsset((await Asset.findById(req.user.avatar))?.public_id).catch((err) => console.log('error', err));
+			const newAvtRes = await uploadAsset(path.resolve(newAvatar.path), 'image');
+			const newAvtAsset = new Asset({
+				public_id: newAvtRes.public_id,
+				resource_type: newAvtRes.resource_type,
+				url: newAvtRes.url,
+			});
+			await newAvtAsset.save();
+			req.user.avatar = newAvtAsset._id;
+		}
+		const updatedUser = await req.user.save();
+
+		return res.status(200).json({
+			message: updatedUser,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
+
 module.exports = {
 	signUp,
 	isEmailExisted,
@@ -254,4 +286,5 @@ module.exports = {
 	myProfile,
 	verifyAccount,
 	changePassword,
+	updateProfile,
 };

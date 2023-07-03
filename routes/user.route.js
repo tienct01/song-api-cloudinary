@@ -1,9 +1,7 @@
 const express = require('express');
-const passport = require('passport');
-const { getRecentlySongs } = require('../controllers/user.controller.js');
-const { isUser } = require('../middlewares/authMiddlewares.js');
+const { getUsers } = require('../controllers/user.controller.js');
 const userRouter = express.Router();
 
-// userRouter.get('/recently_songs', [passport.authenticate('jwt', { session: false }), isUser], getRecentlySongs);
+userRouter.get('/', getUsers);
 
 module.exports = userRouter;

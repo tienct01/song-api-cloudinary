@@ -51,6 +51,8 @@ app.use('/genres', genreRouter);
 app.use('/collections', collectionRouter);
 // playlist api
 app.use('/playlists', playlistRouter);
+// user
+app.use('/users', userRouter);
 
 app.use(errorHanlder);
 

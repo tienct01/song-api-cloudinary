@@ -48,7 +48,19 @@ async function getTracks(req, res, next) {
 		next(error);
 	}
 }
+
+async function getUsers(req, res, next) {
+	try {
+		const data = await User.find();
+		return res.status(200).json({
+			data: data,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
 module.exports = {
 	getRecentlySongs,
 	getTracks,
+	getUsers,
 };

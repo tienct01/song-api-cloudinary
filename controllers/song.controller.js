@@ -11,32 +11,30 @@ const { isValidObjectId } = require('mongoose');
 async function getAllSongs(req, res, next) {
 	try {
 		const { q = '', page = 1, limit = 5 } = req.query;
-		const songs = await Song.find({})
-			.or([
-				{
-					'artist.name': { $regex: q, $options: 'i' },
-				},
-				{
-					name: { $regex: q, $options: 'i' },
-				},
-			])
-			.sort({
-				updatedAt: 'desc',
-			})
-			.skip((page - 1) * limit)
-			.limit(limit);
+		const songs = Song.find({}).sort({
+			updatedAt: 'desc',
+		});
 
-		const songCount = await Song.count().exec();
-		let totalPage;
-		if (songCount % limit !== 0) {
-			totalPage = Math.floor(songCount / limit) + 1;
-		} else {
-			totalPage = Math.floor(songCount / limit);
+		if (q) {
+			songs.or([
+				{
+					'artist.name': { $regex: new RegExp(`${q}`, 'gui') },
+				},
+				{
+					name: { $regex: new RegExp(`${q}`, 'gui') },
+				},
+			]);
 		}
+		const cloneSongs = songs.clone();
+		const songCount = await cloneSongs.count().exec();
+
+		const totalPage = Math.ceil(songCount / limit);
+
+		songs.skip((page - 1) * limit).limit(limit);
 
 		return res.json({
 			totalPage: totalPage,
-			data: songs,
+			data: await songs.exec(),
 		});
 	} catch (error) {
 		next(error);

@@ -1,5 +1,7 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
 const diskStorage = multer.diskStorage({
 	filename: (req, file, cb) => {
 		file.originalname = Buffer.from(path.parse(file.originalname).name, 'latin1').toString('utf8');
@@ -7,7 +9,10 @@ const diskStorage = multer.diskStorage({
 		cb(null, file.fieldname + '-' + uniqueSuffix);
 	},
 	destination: (req, file, cb) => {
-		cb(null, '/uploads');
+		if(!fs.existsSync(path.join(__dirname) + '/uploads')) {
+			fs.mkdirSync(path.join(__dirname), 'uploads');
+		}
+		cb(null, 'uploads');
 	},
 });
 const upload = multer({

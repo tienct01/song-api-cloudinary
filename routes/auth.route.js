@@ -5,8 +5,9 @@ const { validateBody, schemas, validateQueryParams } = require('../middlewares/v
 const { isUser } = require('../middlewares/authMiddlewares.js');
 const upload = require('../middlewares/multer.js');
 const authRouter = express.Router();
+const limiter = require("../middlewares/rateLimitLogin.js");
 
-authRouter.get('/login', validateQueryParams(schemas.loginBody), signIn);
+authRouter.get('/login', validateQueryParams(schemas.loginBody), limiter, signIn);
 authRouter.post('/register', validateBody(schemas.registerBody), signUp);
 authRouter.post('/send_verify_code', validateQueryParams(schemas.verifyBody), sendVerify);
 authRouter.post('/reset_password', validateQueryParams(schemas.verifyBody), resetPassword);

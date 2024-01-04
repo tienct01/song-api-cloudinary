@@ -1,12 +1,13 @@
 const User = require('../models/User.model.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { sendVerifyCode, sendResetPassword } = require('../configs/nodemailer.js');
+const { sendVerifyCode, sendResetPassword, sendWaringMessage } = require('../configs/nodemailer.js');
 const { generateVerifyCode, generateNewPassword, hashPassword } = require('../utils/helpers.js');
 const VerifyCode = require('../models/VerifyCode.model.js');
 const { destroyAsset, uploadAsset } = require('../configs/cloudinaryServices.js');
 const Asset = require('../models/Asset.model.js');
 const path = require('path');
+const limiter = require("../middlewares/rateLimitLogin.js");
 
 //! [POST] /register
 async function signUp(req, res, next) {
@@ -41,6 +42,7 @@ async function signUp(req, res, next) {
 //! [GET] /login
 async function signIn(req, res, next) {
 	try {
+		// Check rate limit
 		const { email, password } = req.query;
 		if (email === '' || password === '') {
 			return res.status(400).json({
@@ -60,6 +62,10 @@ async function signIn(req, res, next) {
 			});
 		}
 		const match = await user.comparePassword(password);
+
+		if(req.rateLimit && req.rateLimit.remaining == 0 && user) {
+			sendWaringMessage(email);
+		}
 
 		if (!match) {
 			return res.status(400).json({

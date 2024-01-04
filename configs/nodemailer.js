@@ -19,7 +19,7 @@ async function sendVerifyCode(email, verifyCode) {
 			from: `[Music App] ${process.env.GOOGLE_USER}`,
 			to: email,
 			html: html,
-			subject: 'Music App',
+			subject: 'Song cloud',
 		});
 	} catch (error) {
 		throw error;
@@ -35,8 +35,21 @@ async function sendResetPassword(email, newPassword) {
 			from: process.env.GOOGLE_USER,
 			to: email,
 			html: html,
-			subject: 'Music App',
+			subject: 'Song cloud',
 		});
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function sendWaringMessage(email) {
+	try {
+		return transporter.sendMail({
+			form: `[Music App] ${process.env.GOOGLE_USER}`,
+			to: email,
+			html: '<h2>Some one is trying to login to your account. Please change password if that is not you</h2>',
+			subject: "Song cloud"
+		})
 	} catch (error) {
 		throw error;
 	}
@@ -44,4 +57,5 @@ async function sendResetPassword(email, newPassword) {
 module.exports = {
 	sendVerifyCode,
 	sendResetPassword,
+	sendWaringMessage
 };
